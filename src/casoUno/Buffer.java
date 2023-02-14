@@ -12,58 +12,31 @@ public class Buffer {
     }
 
 
-    public synchronized void almacenar (Producto i, String colorr) {
-
-        if(colorr.equals("AZUL")) {
-        	while (buff.size() == n) 
-            	try {
-                   wait() ;
-            	} 
-            catch (InterruptedException e) {
-            	
-            }
-
-            buff.add (i) ; 
-            notify () ;
-        }
-        else {
-        	if (buff.size() == n) 
-        	{
-        		Thread.yield();
-        	}
-            buff.add (i) ; 
-            notify () ;
-        }
+    public void almacenar (Producto i) {
+    	buff.add (i) ;
     }
     
-
-    public synchronized Producto retirar (String colorr) {
-
-        if(colorr.equals("AZUL")) {
-        	while (buff.size () == 0) 
-            	try {
-                    wait() ;  //Conceptual
-             	} 
-             catch (InterruptedException e) {
-             	
-             }
-
-            Producto i = (Producto) buff.remove (0) ;
-            notify () ;
-
-            return i ;
-        }
-        else {
-        	if (buff.size() == 0) 
-        	{
-        		Thread.yield();
-        	}
-            Producto i = (Producto) buff.remove (0) ;
-            notify () ;
-
-            return i ;
-        }
+    
+    public Producto retirar () {
+    	Producto i = (Producto) buff.remove (0) ;
+        return i ;
     }
+
+
+	public boolean puedoAlmacenar() {
+		boolean centinela = true;
+		if(buff.size() == n) {
+			centinela = false;
+		}
+		return centinela;
+	}
+	public boolean puedoRetirar() {
+		boolean centinela = true;
+		if(buff.size() == 0) {
+			centinela = false;
+		}
+		return centinela;
+	}
 
 
 }

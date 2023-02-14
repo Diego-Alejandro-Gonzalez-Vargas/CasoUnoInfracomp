@@ -18,15 +18,41 @@ public class ProcesoUno extends Thread{
 	
 	while (producidos < aProducir) {
 		//System.out.println("Productor " + " produciendo: " + producidos);
-		Producto prod = new Producto();
-		theBuffer.almacenar(prod, color);
-		System.out.println("guarde producto");
-		System.out.println("Produje el producto: " + prod.getElstring());
-		producidos++;
-		//try {
+		almacenar();
+		//System.out.println("guarde producto");
+		try {
             // Esperamos entre 0 y 4 segundos 
-        //    sleep((int) (Math.random() * 4000));
-        //} catch (InterruptedException e) { }
+            sleep((int) (Math.random() * 4000));
+        } catch (InterruptedException e) { }
 	}
+  }
+  
+  public synchronized void almacenar() {
+	  if(color.equals("AZUL")) {
+      	while (!theBuffer.puedoAlmacenar()) { 
+          	try {
+                 wait() ;
+          	} 
+          catch (InterruptedException e) {
+          	
+          }
+      	}
+      	Producto prod = new Producto();
+        theBuffer.almacenar(prod) ;
+        producidos++;
+        System.out.println("Produje el producto: " + prod.getElstring());
+        notify () ;
+      }
+      else {
+      	while (!theBuffer.puedoAlmacenar()) 
+      	{
+      		Thread.yield();
+      	}
+      	Producto prod = new Producto();
+      	theBuffer.almacenar(prod) ;
+      	producidos++;
+      	System.out.println("Produje el producto: " + prod.getElstring());
+        notify () ;
+      }
   }
 }
