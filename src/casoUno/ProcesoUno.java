@@ -1,5 +1,7 @@
 package casoUno;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class ProcesoUno extends Thread{
 
   private int aProducir;
@@ -17,42 +19,66 @@ public class ProcesoUno extends Thread{
   public void run() {
 	
 	while (producidos < aProducir) {
-		//System.out.println("Productor " + " produciendo: " + producidos);
+
 		almacenar();
-		//System.out.println("guarde producto");
-		try {
-            // Esperamos entre 0 y 4 segundos 
-            sleep((int) (Math.random() * 4000));
-        } catch (InterruptedException e) { }
+		
 	}
   }
   
-  public synchronized void almacenar() {
+  
+  public  void almacenar() {
 	  if(color.equals("AZUL")) {
-      	while (!theBuffer.puedoAlmacenar()) { 
-          	try {
-                 wait() ;
-          	} 
-          catch (InterruptedException e) {
+		  Producto prod = new Producto("AZUL");
+		  Integer tiempoImprimir = ThreadLocalRandom.current().nextInt(50, 500);
+          try {
+			sleep(tiempoImprimir);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		  System.out.println("Produje el producto: " + prod.getElstring()+ ". DEMORA ETAPA 1: " +tiempoImprimir + "mseg.");
+		  String transformador = prod.getElstring() + "DEMORA ETAPA 1: " +tiempoImprimir + "mseg.";
+	      prod.setElstring(transformador);
+		  synchronized(theBuffer) {
+      	while (!theBuffer.almacenarBien(prod)) { 
+      		
+          	    try {
+                   theBuffer.wait() ;
+          	     } 
+                 catch (InterruptedException e) {
           	
-          }
+                 }
+      		
       	}
-      	Producto prod = new Producto();
-        theBuffer.almacenar(prod) ;
+      	
+  
         producidos++;
-        System.out.println("Produje el producto: " + prod.getElstring());
-        notify () ;
+        
+        theBuffer.notifyAll () ;
+        }   
       }
       else {
-      	while (!theBuffer.puedoAlmacenar()) 
+    	  
+    	  Producto prod = new Producto("NARANJA");
+    	  Integer tiempoImprimir = ThreadLocalRandom.current().nextInt(50, 500);
+          try {
+			sleep(tiempoImprimir);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		  System.out.println("Produje el producto: " + prod.getElstring()+ ". DEMORA ETAPA 1: " +tiempoImprimir + "mseg.");
+		  String transformador = prod.getElstring() + "DEMORA ETAPA 1: " +tiempoImprimir + "mseg.";
+	      prod.setElstring(transformador);
+    		while (!theBuffer.almacenarBien(prod)) 
       	{
       		Thread.yield();
       	}
-      	Producto prod = new Producto();
-      	theBuffer.almacenar(prod) ;
       	producidos++;
-      	System.out.println("Produje el producto: " + prod.getElstring());
-        notify () ;
+      	
+      
+       
       }
   }
+
 }
